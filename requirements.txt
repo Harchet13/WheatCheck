@@ -1,0 +1,8 @@
+ultralytics
+streamlit
+pillow
+streamlit-analytics
+streamlit-screen-stats
+streamlit-local-storage
+streamlit-browser-session-storage
+streamlit-carousel
