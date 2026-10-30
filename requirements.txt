@@ -1,8 +1,6 @@
-ultralytics
-streamlit
-pillow
-streamlit-analytics
-streamlit-screen-stats
-streamlit-local-storage
-streamlit-browser-session-storage
-streamlit-carousel
+pillow==13.0.0
+streamlit==1.66.1
+streamlit-analytics2==0.11.1
+streamlit-carousel==1.1.2
+streamlit-screen-stats==0.0.82
+ultralytics==8.4.194
