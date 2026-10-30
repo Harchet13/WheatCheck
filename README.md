@@ -9,7 +9,9 @@ Blight, Mildew, Mite, Septoria, Smut, Stem fly, Tan spot and Yellow Rust.
 
 ## Run locally
 
-Requires Python 3.10+.
+Requires Python 3.10+ and [Git LFS](https://git-lfs.com), which stores the
+model file. Run `git lfs install` once before cloning; in an existing clone,
+run `git lfs pull` to fetch `best.pt`.
 
 ```sh
 python -m venv .venv
@@ -35,7 +37,7 @@ end with Streamlit's `AppTest`.
 | --- | --- |
 | `streamlit_app.py` | The app: layout, image upload and prediction |
 | `content.py` | All user-facing text, per language |
-| `best.pt` | The trained YOLO classification model |
+| `best.pt` | The trained YOLO classification model (stored in Git LFS) |
 | `assets/` | Logo, favicon and page images |
 | `assets/samples/` | One sample photo per disease, used in the gallery and tests |
 | `packages.txt` | System packages for Streamlit Community Cloud |
