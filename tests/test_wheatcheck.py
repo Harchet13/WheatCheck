@@ -17,7 +17,6 @@ from content import GALLERY, LANGUAGES, TEXT  # noqa: E402
 APP = ROOT / "streamlit_app.py"
 MODEL = ROOT / "best.pt"
 CONFIDENCE_THRESHOLD = 0.70
-KNOWN_MISSES = {"Common Root Rot"}  # its sample is currently predicted as Smut (0.73)
 
 
 @pytest.fixture(autouse=True)
@@ -38,14 +37,7 @@ def test_model_is_classifier_with_expected_classes(model):
     assert set(model.names.values()) == set(GALLERY) | {"Healthy"}
 
 
-@pytest.mark.parametrize(
-    "cls",
-    [
-        pytest.param(c, marks=pytest.mark.xfail(reason="known misclassification", strict=True))
-        if c in KNOWN_MISSES else c
-        for c in GALLERY
-    ],
-)
+@pytest.mark.parametrize("cls", list(GALLERY))
 def test_model_classifies_sample_image(model, cls):
     result = model.predict(str(ROOT / GALLERY[cls]), verbose=False)[0]
     assert result.names[result.probs.top1] == cls

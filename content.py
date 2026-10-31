@@ -14,7 +14,7 @@ GALLERY = {
     'Mite': 'assets/samples/mite_26.jpeg',
     'Stem fly': 'assets/samples/stem_fly_30.jpeg',
     'Black Rust': 'assets/samples/black_rust_1.jpeg',
-    'Common Root Rot': 'assets/samples/common_root_rot_55.jpeg',
+    'Common Root Rot': 'assets/samples/common_root_rot_73.png',
     'Leaf Blight': 'assets/samples/leaf_blight_38.jpeg',
     'Septoria': 'assets/samples/septoria_5.png',
     'Tan spot': 'assets/samples/tan_spot_24.jpeg',

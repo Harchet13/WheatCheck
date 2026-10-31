@@ -5,3 +5,8 @@ __pycache__/
 .venv/
 venv/
 .streamlit/secrets.toml
+
+# Training outputs (see train.py)
+datasets/
+runs/
+yolo*-cls.pt
