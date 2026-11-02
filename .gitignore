@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.streamlit/secrets.toml
+
+# Training outputs (see train.py)
+datasets/
+runs/
+yolo*-cls.pt
