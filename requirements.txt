@@ -7,6 +7,9 @@ torchvision==0.29.1
 pillow==13.0.0
 streamlit==1.66.1
 streamlit-analytics2==0.11.1
+# Imported by streamlit-screen-stats but not declared as its dependencies.
+streamlit-browser-session-storage==0.0.12
 streamlit-carousel==1.1.2
+streamlit-local-storage==0.0.25
 streamlit-screen-stats==0.0.82
 ultralytics==8.4.194
