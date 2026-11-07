@@ -1,0 +1,17 @@
+class,train_images,train_unique,test_images,test_also_in_train,test_unseen
+Aphid,903,878,50,50,0
+Black Rust,576,433,50,50,0
+Blast,647,593,49,49,0
+Brown Rust,1271,1270,50,0,50
+Common Root Rot,614,586,50,50,0
+Fusarium Head Blight,611,597,50,2,48
+Healthy,1000,987,50,0,50
+Leaf Blight,842,758,50,50,0
+Mildew,1081,1081,50,0,50
+Mite,800,774,50,49,1
+Septoria,1144,447,50,50,0
+Smut,1310,526,50,43,7
+Stem fly,234,172,50,49,1
+Tan spot,770,746,49,49,0
+Yellow Rust,1301,1301,50,0,50
+TOTAL,13104,11149,748,491,257

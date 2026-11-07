@@ -52,6 +52,10 @@ held-out test images. Defaults match the original run (YOLOv8l-cls, 20 epochs,
 `--device mps` on Apple Silicon. Copy the printed `best.pt` over `./best.pt`
 to ship it.
 
+[`training/`](training/README.md) holds the record of the original run: its
+settings, per-epoch metrics, confusion matrices, and a checksum manifest of
+every training and test image.
+
 ## Project layout
 
 | Path | What it is |
@@ -62,6 +66,7 @@ to ship it.
 | `assets/` | Logo, favicon and page images |
 | `assets/samples/` | One sample photo per disease, used in the gallery and tests |
 | `train.py` | Rebuilds the dataset split and retrains the model |
+| `training/` | Record of the run that produced `best.pt`, and a dataset manifest |
 | `.streamlit/config.toml` | The app's colour theme and font |
 | `packages.txt` | System packages for Streamlit Community Cloud |
 
