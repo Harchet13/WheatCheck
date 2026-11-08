@@ -1,0 +1,18 @@
+class                     n  correct  shown  most common mistakes
+Aphid                    87      83%    80%  [('Mite', 7), ('Tan spot', 2)]
+Black Rust               33      79%    73%  [('Blast', 4), ('Brown Rust', 2)]
+Blast                    59      93%    90%  [('Smut', 2), ('Leaf Blight', 1)]
+Brown Rust              121      94%    88%  [('Tan spot', 3), ('Black Rust', 3)]
+Common Root Rot          58      78%    74%  [('Blast', 5), ('Aphid', 2)]
+Fusarium Head Blight     64      97%    95%  [('Leaf Blight', 1), ('Common Root Rot', 1)]
+Healthy                 104      98%    95%  [('Mildew', 1), ('Septoria', 1)]
+Leaf Blight              62      68%    63%  [('Tan spot', 10), ('Common Root Rot', 4)]
+Mildew                  113      96%    94%  [('Leaf Blight', 3), ('Healthy', 2)]
+Mite                     77      86%    83%  [('Tan spot', 4), ('Aphid', 4)]
+Septoria                 35      97%    94%  [('Mildew', 1)]
+Smut                     52      85%    79%  [('Blast', 4), ('Common Root Rot', 1)]
+Stem fly                 17      82%    82%  [('Mite', 2), ('Common Root Rot', 1)]
+Tan spot                 71      70%    59%  [('Leaf Blight', 6), ('Blast', 3)]
+Yellow Rust             135      96%    95%  [('Healthy', 2), ('Septoria', 1)]
+overall accuracy: 964/1088 = 88.6%
+('shown' = correct with confidence >= 70%, so the app displays it)
