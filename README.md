@@ -47,12 +47,12 @@ python train.py --data path/to/data      # or use a local copy
 The dataset's own test split mostly repeats training images, so `train.py`
 pools all images, removes exact duplicates and makes a fresh train/val/test
 split before training. It finishes by printing per-class accuracy on the
-held-out test images. Defaults match the original run (YOLOv8l-cls, 20 epochs,
+held-out test images. Defaults match the current model (YOLOv8s-cls, 20 epochs,
 224 px); training on a CPU is slow, so pass `--device 0` on a CUDA GPU or
 `--device mps` on Apple Silicon. Copy the printed `best.pt` over `./best.pt`
 to ship it.
 
-[`training/`](training/README.md) holds the record of the original run: its
+[`training/`](training/README.md) holds the records of the current and previous training runs: their
 settings, per-epoch metrics, confusion matrices, and a checksum manifest of
 every training and test image.
 

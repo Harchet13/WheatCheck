@@ -127,7 +127,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data", help="local copy of the dataset (default: download from Kaggle)")
     parser.add_argument("--out", default="datasets/wheat", help="where to build the deduplicated split")
-    parser.add_argument("--model", default="yolov8l-cls.pt", help="pretrained weights to start from")
+    parser.add_argument("--model", default="yolov8s-cls.pt", help="pretrained weights to start from")
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--imgsz", type=int, default=224)
     parser.add_argument("--batch", type=int, default=32)

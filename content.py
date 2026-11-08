@@ -10,7 +10,7 @@ LANGUAGES = {"English": "en", "ਪੰਜਾਬੀ": "pa", "हिंदी": "hi
 # Model class -> sample image shown in the landing-page gallery.
 GALLERY = {
     'Aphid': 'assets/samples/aphid_1.jpeg',
-    'Brown Rust': 'assets/samples/brown_rust_3.jpeg',
+    'Brown Rust': 'assets/samples/brown_rust_462.png',
     'Mite': 'assets/samples/mite_26.jpeg',
     'Stem fly': 'assets/samples/stem_fly_30.jpeg',
     'Black Rust': 'assets/samples/black_rust_1.jpeg',
@@ -22,7 +22,7 @@ GALLERY = {
     'Fusarium Head Blight': 'assets/samples/fusarium_head_blight_test_0.png',
     'Mildew': 'assets/samples/mildew_82.png',
     'Smut': 'assets/samples/smut_test_0.png',
-    'Yellow Rust': 'assets/samples/yellow_rust_256.png',
+    'Yellow Rust': 'assets/samples/yellow_rust_test_3.png',
 }
 
 TEXT = {
