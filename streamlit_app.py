@@ -1,16 +1,16 @@
 """WheatCheck: identify wheat diseases and pests from a photo."""
-import base64
+import base64 # allows you to encode and decode binary data into a safe, text-only format.
 import io
 import os
 
-import streamlit as st
+import streamlit as st # for the web page
 import streamlit_analytics2 as streamlit_analytics
-from PIL import Image
+from PIL import Image # for opening images
 from st_screen_stats import ScreenData
 from streamlit_carousel import carousel
-from ultralytics import YOLO
+from ultralytics import YOLO # for the model
 
-from content import GALLERY, LANGUAGES, TEXT
+from content import GALLERY, LANGUAGES, TEXT # GALLERY: gallery pics, LANGUAGES: list of languages, TEXT: all the text in English, Hindi and Punjabi.
 
 MODEL_PATH = "best.pt"
 # Predictions below this top-1 confidence are not shown to the user.
@@ -19,13 +19,14 @@ CONFIDENCE_THRESHOLD = 0.70
 st.set_page_config(page_title="WheatCheck", page_icon="assets/icon.png", layout="wide")
 
 
-@st.cache_resource
+# Helper functions
+@st.cache_resource # model loaded once and reused, not reloaded on every click.
 def load_model():
-    return YOLO(MODEL_PATH)
+    return YOLO(MODEL_PATH) # loads the model from best.pt
 
 
 @st.cache_data
-def thumbnail(path, width=400):
+def thumbnail(path, width=400): # Taking long to load so shrinks a gallery photo to a small JPEG
     """JPEG bytes of a gallery image, scaled down from the multi-megabyte original."""
     img = Image.open(path).convert("RGB")
     img.thumbnail((width, width * 2))
