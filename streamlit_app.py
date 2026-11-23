@@ -2,21 +2,44 @@
 import base64 # allows you to encode and decode binary data into a safe, text-only format.
 import io
 import os
+from urllib.parse import quote_plus
 
 import streamlit as st # for the web page
+import streamlit.components.v1 as components
 import streamlit_analytics2 as streamlit_analytics
 from PIL import Image # for opening images
 from st_screen_stats import ScreenData
 from streamlit_carousel import carousel
 from ultralytics import YOLO # for the model
 
-from content import GALLERY, LANGUAGES, TEXT # GALLERY: gallery pics, LANGUAGES: list of languages, TEXT: all the text in English, Hindi and Punjabi.
+# GALLERY: sample pics, LANGUAGES: list of languages, TEXT: all the text in English, Hindi and Punjabi,
+# PRODUCTS/SHOPS: what to buy for each disease and where.
+from content import GALLERY, LANGUAGES, PRODUCTS, SHOPS, TEXT
+from howto import howto_html
 
 MODEL_PATH = "best.pt"
 # Predictions below this top-1 confidence are not shown to the user.
 CONFIDENCE_THRESHOLD = 0.70
+# Shown in every language so anyone can find the language picker.
+LANGUAGE_LABEL = "🌐 Language · भाषा · ਭਾਸ਼ਾ"
 
-st.set_page_config(page_title="WheatCheck", page_icon="assets/icon.png", layout="wide")
+st.set_page_config(page_title="WheatCheck", page_icon="assets/icon.png", layout="centered")
+
+# The language bar is a bright gold strip so it stands out against the teal page.
+st.html("""<style>
+.st-key-lang_bar { background: #F5C518; border-radius: 14px; padding: 10px 14px 12px;
+                   box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+.st-key-lang_bar label, .st-key-lang_bar label p { color: #1b1b1b !important; font-weight: 700; font-size: 1.05rem; }
+.st-key-lang_bar button { background: #fffdf3; border: 2px solid #1b1b1b; min-height: 2.6rem; padding: 0 1.1rem; }
+.st-key-lang_bar button * { color: #1b1b1b !important; font-size: 1.1rem; font-weight: 600; }
+.st-key-lang_bar button[aria-checked="true"] { background: #1b1b1b !important; border-color: #1b1b1b !important; }
+.st-key-lang_bar button[aria-checked="true"] * { color: #F5C518 !important; }
+.st-key-upload_card { background: rgba(0,0,0,.18); }
+.wc-header { display: flex; align-items: center; gap: 14px; margin: .5rem 0 .25rem; }
+.wc-header img { width: 72px; height: 72px; flex: none; border-radius: 50%; }
+.wc-title { margin: 0; padding: 0 !important; font-size: clamp(1.3rem, 5.5vw, 2rem) !important; line-height: 1.25 !important; }
+.wc-tagline { opacity: .9; margin: .2rem 0 0; font-size: .95rem; }
+</style>""")
 
 
 # Helper functions
@@ -33,6 +56,11 @@ def thumbnail(path, width=400): # Taking long to load so shrinks a gallery photo
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=85)
     return buf.getvalue()
+
+
+@st.cache_data
+def logo_base64():
+    return base64.b64encode(thumbnail("assets/logo.png", width=160)).decode()
 
 
 def is_portrait():
@@ -70,58 +98,120 @@ def render_gallery(text, portrait):
         ])
     else:
         items = list(GALLERY.items())
-        for row in (items[:7], items[7:]):
-            for col, (cls, path) in zip(st.columns(7), row):
+        for start in range(0, len(items), 4):
+            for col, (cls, path) in zip(st.columns(4), items[start:start + 4]):
                 col.image(thumbnail(path), caption=names[cls])
+
+
+# Pop-up windows opened by the help buttons; only one is open at a time.
+@st.dialog("WheatCheck", width="large")
+def howto_dialog(text):
+    st.subheader(text["how_to_button"])
+    components.html(
+        howto_html(text["animation_captions"], text["analyze_button"],
+                   text["disease_names"]["Yellow Rust"], text["buy_heading"]),
+        height=500,
+    )
+
+
+@st.dialog("WheatCheck", width="large")
+def samples_dialog(text, portrait):
+    st.subheader(text["samples_button"])
+    st.caption(text["samples_intro"])
+    render_gallery(text, portrait)
+
+
+@st.dialog("WheatCheck", width="large")
+def about_dialog(text):
+    for section in text["intro"] + text["about"]:
+        render_section(section)
+
+
+def render_products(text, cls):
+    """Buy links for the products that act on the remedies for `cls`."""
+    st.markdown(f"**{text['buy_heading']}**")
+    for name, kind in PRODUCTS[cls]:
+        with st.container(border=True):
+            st.markdown(f"**{name}**  \n:gray[{text['product_types'][kind]}]")
+            for col, (shop, url) in zip(st.columns(len(SHOPS)), SHOPS.items()):
+                col.link_button(f"{shop} ↗", url.format(quote_plus(name)), use_container_width=True)
+    st.caption(text["buy_note"])
 
 
 def render_result(text, upload):
     image = Image.open(upload).convert("RGB")
-    st.markdown(text["image_heading"])
-    st.image(image)
-
     result = load_model().predict(image, verbose=False)[0]
     cls = result.names[result.probs.top1]
     conf = float(result.probs.top1conf)
 
-    if conf < CONFIDENCE_THRESHOLD:
-        st.warning(text["low_confidence"])
-    elif cls == "Healthy":
-        st.success(text["no_disease"])
-    else:
+    photo, details = st.columns([2, 3])
+    photo.markdown(text["image_heading"])
+    photo.image(image)
+
+    with details:
+        if conf < CONFIDENCE_THRESHOLD:
+            st.warning(text["low_confidence"])
+            return
+        if cls == "Healthy":
+            st.success(text["no_disease"])
+            st.write(text["healthy_tip"])
+            render_products(text, cls)
+            return
         info = text["diseases"][cls]
-        st.subheader(text["result_heading"])
-        st.write(f"{text['disease_label']}: {text['disease_names'][cls]}")
-        st.write(f"{text['confidence_label']}: {conf:.0%}")
+        st.markdown(text["result_heading"])
+        st.subheader(f"{text['disease_label']}: {text['disease_names'][cls]}")
+        st.progress(conf, text=f"{text['confidence_label']}: {conf:.0%}")
         st.write(info["description"])
-        for key in ("causes", "preventions", "remedies"):
-            st.markdown(f"{text[key + '_label']}:\n\n" + "\n".join(f"- {item}" for item in info[key]))
+
+    # The most actionable tab, remedies with buy links, comes first.
+    remedies, preventions, causes = st.tabs(
+        [f"💊 {text['remedies_label']}", f"🛡️ {text['preventions_label']}", f"🔍 {text['causes_label']}"]
+    )
+    with remedies:
+        st.markdown("\n".join(f"- {item}" for item in info["remedies"]))
+        render_products(text, cls)
+    preventions.markdown("\n".join(f"- {item}" for item in info["preventions"]))
+    causes.markdown("\n".join(f"- {item}" for item in info["causes"]))
 
 
 portrait = is_portrait()
 
 # The analytics dashboard is at ?analytics=on; set ANALYTICS_PASSWORD to protect it.
 with streamlit_analytics.track(unsafe_password=os.environ.get("ANALYTICS_PASSWORD")):
-    language = st.radio("Language", options=list(LANGUAGES), horizontal=True, key="selected_language")
-    text = TEXT[LANGUAGES[language]]
+    with st.container(key="lang_bar"):
+        language = st.segmented_control(
+            LANGUAGE_LABEL, options=list(LANGUAGES), default="English", key="selected_language",
+        )
+    # Clicking the selected language again clears it; fall back to English.
+    text = TEXT[LANGUAGES[language or "English"]]
 
-    logo, title = st.columns([1, 3] if portrait else [3, 9], vertical_alignment="center")
-    logo.image("assets/logo.png")
-    title.markdown(f"<h1 style='text-align: center;'>{text['title']}</h1>", unsafe_allow_html=True)
+    # Logo and title stay side by side, even on phones.
+    st.markdown(
+        f"<div class='wc-header'><img src='data:image/jpeg;base64,{logo_base64()}' alt=''>"
+        f"<div><h1 class='wc-title'>{text['title']}</h1><p class='wc-tagline'>{text['tagline']}</p></div></div>",
+        unsafe_allow_html=True,
+    )
 
-    for i, section in enumerate(text["intro"]):
-        render_section(section, st.header if i == 0 else st.subheader)
+    # Everything except the upload steps lives behind these buttons.
+    how_col, samples_col, about_col = st.columns(3)
+    with how_col:
+        if st.button(text["how_to_button"], key="how_to", use_container_width=True):
+            howto_dialog(text)
+    with samples_col:
+        if st.button(text["samples_button"], key="samples", use_container_width=True):
+            samples_dialog(text, portrait)
+    with about_col:
+        if st.button(text["about_button"], key="about", use_container_width=True):
+            about_dialog(text)
 
-    render_gallery(text, portrait)
+    with st.container(border=True, key="upload_card"):
+        st.subheader(text["steps_heading"])
+        st.markdown("\n".join(f"{i}. {step}" for i, step in enumerate(text["steps"], 1)))
+        upload = st.file_uploader(text["upload_label"], type=["jpg", "jpeg", "png"])
+        analyze = st.button(text["analyze_button"], key="analyze", type="primary",
+                            use_container_width=True)
 
-    for section in text["about"]:
-        render_section(section)
-
-    st.subheader(text["steps_heading"])
-    st.markdown("\n".join(f"- {step}" for step in text["steps"]))
-
-    upload = st.file_uploader(text["upload_label"], type=["jpg", "jpeg", "png"])
-    if st.button(text["analyze_button"]):
+    if analyze:
         if upload is None:
             st.warning(text["upload_first"])
         else:

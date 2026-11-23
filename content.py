@@ -25,6 +25,86 @@ GALLERY = {
     'Yellow Rust': 'assets/samples/yellow_rust_test_3.png',
 }
 
+# Online agri-input shops. Each URL is a product search, filled in with the
+# product name, so links keep working when a shop's listings change.
+SHOPS = {
+    'BigHaat': 'https://www.bighaat.com/search?q={}',
+    'Amazon': 'https://www.amazon.in/s?k={}',
+}
+
+# Model class -> products a farmer can buy to act on the remedies, as
+# (product name, product type). Types are translated via TEXT[lang]['product_types'].
+# Names are active ingredients as printed on Indian product labels.
+PRODUCTS = {
+    'Aphid': [
+        ('Imidacloprid 17.8% SL', 'insecticide'),
+        ('Thiamethoxam 25% WG', 'insecticide'),
+        ('Neem oil 1500 ppm', 'bio'),
+    ],
+    'Brown Rust': [
+        ('Propiconazole 25% EC', 'fungicide'),
+        ('Tebuconazole 25.9% EC', 'fungicide'),
+        ('Muriate of Potash', 'fertilizer'),
+    ],
+    'Mite': [
+        ('Sulphur 80% WDG', 'fungicide'),
+        ('Propargite 57% EC', 'insecticide'),
+        ('Neem oil 1500 ppm', 'bio'),
+    ],
+    'Stem fly': [
+        ('Thiamethoxam 30% FS', 'seed'),
+        ('Imidacloprid 48% FS', 'seed'),
+        ('Fipronil 0.3% GR', 'insecticide'),
+    ],
+    'Black Rust': [
+        ('Propiconazole 25% EC', 'fungicide'),
+        ('Tebuconazole 25.9% EC', 'fungicide'),
+        ('Muriate of Potash', 'fertilizer'),
+    ],
+    'Common Root Rot': [
+        ('Carbendazim 50% WP', 'seed'),
+        ('Trichoderma viride', 'bio'),
+        ('NPK 12-32-16 fertilizer', 'fertilizer'),
+    ],
+    'Leaf Blight': [
+        ('Mancozeb 75% WP', 'fungicide'),
+        ('Propiconazole 25% EC', 'fungicide'),
+    ],
+    'Septoria': [
+        ('Azoxystrobin 23% SC', 'fungicide'),
+        ('Mancozeb 75% WP', 'fungicide'),
+    ],
+    'Tan spot': [
+        ('Mancozeb 75% WP', 'fungicide'),
+        ('Azoxystrobin 11% + Tebuconazole 18.3% SC', 'fungicide'),
+    ],
+    'Blast': [
+        ('Tricyclazole 75% WP', 'fungicide'),
+        ('Azoxystrobin 23% SC', 'fungicide'),
+    ],
+    'Fusarium Head Blight': [
+        ('Tebuconazole 25.9% EC', 'fungicide'),
+        ('Carbendazim 50% WP', 'fungicide'),
+    ],
+    'Mildew': [
+        ('Sulphur 80% WP', 'fungicide'),
+        ('Propiconazole 25% EC', 'fungicide'),
+    ],
+    'Smut': [
+        ('Carboxin 37.5% + Thiram 37.5% WS', 'seed'),
+        ('Tebuconazole 2% DS', 'seed'),
+    ],
+    'Yellow Rust': [
+        ('Propiconazole 25% EC', 'fungicide'),
+        ('Tebuconazole 50% + Trifloxystrobin 25% WG', 'fungicide'),
+        ('Muriate of Potash', 'fertilizer'),
+    ],
+    'Healthy': [
+        ('NPK 19-19-19 fertilizer', 'fertilizer'),
+        ('Zinc sulphate fertilizer', 'fertilizer'),
+    ],
+}
+
 TEXT = {
     'en': {
         'title': 'WheatCheck - Wheat Disease Detection',
@@ -75,9 +155,9 @@ TEXT = {
         ],
         'steps_heading': 'Steps to use the app',
         'steps': [
-            'Take a clear image',
-            'Upload the image',
-            'Analyze the image and the name and confidence level of the disease along with the causes, preventions, and remedies will be displayed in the result panel below',
+            'Take a clear, close photo of the affected leaf, stem or ear',
+            'Upload the photo below',
+            'Tap Analyze to see the disease and how to treat it',
         ],
         'upload_label': 'Upload your image',
         'analyze_button': 'Analyze',
@@ -91,6 +171,27 @@ TEXT = {
         'causes_label': 'Causes',
         'preventions_label': 'Preventions',
         'remedies_label': 'Remedies',
+        'tagline': 'Snap a photo of your wheat and find out what is wrong and how to treat it.',
+        'how_to_button': '▶️ How to use',
+        'samples_button': '🖼️ Sample images',
+        'about_button': 'ℹ️ About',
+        'samples_intro': 'These are the diseases and pests WheatCheck can recognise.',
+        'animation_captions': [
+            'Take a clear photo of the sick leaf or ear',
+            'Upload the photo',
+            'Tap Analyze',
+            'See the disease and buy the remedy',
+        ],
+        'buy_heading': '🛒 Where to buy',
+        'buy_note': 'Always read the product label for dose and safety, and check with your local agriculture officer or Krishi Vigyan Kendra before spraying.',
+        'healthy_tip': 'Your crop looks healthy. Keep it strong with balanced fertilizer:',
+        'product_types': {
+            'fungicide': 'Fungicide',
+            'insecticide': 'Insecticide',
+            'fertilizer': 'Fertilizer',
+            'bio': 'Organic / bio-control',
+            'seed': 'Seed treatment',
+        },
         'disease_names': {
             'Aphid': 'Aphid',
             'Brown Rust': 'Brown Rust',
@@ -308,9 +409,9 @@ TEXT = {
         ],
         'steps_heading': 'ऐप का उपयोग करने के चरण',
         'steps': [
-            'साफ़ छवि लें',
-            'छवि अपलोड करें',
-            'छवि का विश्लेषण करें और बीमारी के नाम और आत्मविश्वास के स्तर के साथ-साथ कारण, रोकथाम और उपचार नीचे परिणाम पैनल में प्रदर्शित किए जाएंगे।',
+            'प्रभावित पत्ती, तने या बाली की साफ़ और नज़दीक से फ़ोटो लें',
+            'नीचे फ़ोटो अपलोड करें',
+            'बीमारी और उसका इलाज देखने के लिए "विश्लेषण करें" दबाएँ',
         ],
         'upload_label': 'अपनी छवि अपलोड करें',
         'analyze_button': 'विश्लेषण करें',
@@ -324,6 +425,27 @@ TEXT = {
         'causes_label': 'कारण',
         'preventions_label': 'रोकथाम',
         'remedies_label': 'उपाय',
+        'tagline': 'अपनी गेहूँ की फसल की फ़ोटो लें और जानें कि क्या बीमारी है और उसका इलाज क्या है।',
+        'how_to_button': '▶️ उपयोग कैसे करें',
+        'samples_button': '🖼️ नमूना तस्वीरें',
+        'about_button': 'ℹ️ जानकारी',
+        'samples_intro': 'ये वे बीमारियाँ और कीट हैं जिन्हें वीटचेक पहचान सकता है।',
+        'animation_captions': [
+            'बीमार पत्ती या बाली की साफ़ फ़ोटो लें',
+            'फ़ोटो अपलोड करें',
+            '"विश्लेषण करें" दबाएँ',
+            'बीमारी देखें और दवा खरीदें',
+        ],
+        'buy_heading': '🛒 कहाँ से खरीदें',
+        'buy_note': 'मात्रा और सुरक्षा के लिए हमेशा उत्पाद का लेबल पढ़ें, और छिड़काव से पहले अपने स्थानीय कृषि अधिकारी या कृषि विज्ञान केंद्र से सलाह लें।',
+        'healthy_tip': 'आपकी फसल स्वस्थ दिखती है। संतुलित उर्वरक से इसे मज़बूत रखें:',
+        'product_types': {
+            'fungicide': 'कवकनाशी',
+            'insecticide': 'कीटनाशक',
+            'fertilizer': 'उर्वरक',
+            'bio': 'जैविक नियंत्रण',
+            'seed': 'बीज उपचार',
+        },
         'disease_names': {
             'Aphid': 'एफिड',
             'Brown Rust': 'भूरा जंग',
@@ -568,9 +690,9 @@ TEXT = {
         ],
         'steps_heading': 'ਐਪ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਕਦਮ',
         'steps': [
-            'ਇੱਕ ਸਪਸ਼ਟ ਚਿੱਤਰ ਲਓ',
-            'ਚਿੱਤਰ ਅੱਪਲੋਡ ਕਰੋ',
-            'ਚਿੱਤਰ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ ਅਤੇ ਬਿਮਾਰੀ ਦੇ ਨਾਮ ਅਤੇ ਵਿਸ਼ਵਾਸ ਪੱਧਰ ਦੇ ਨਾਲ ਕਾਰਨ, ਰੋਕਥਾਮ ਅਤੇ ਉਪਚਾਰ ਹੇਠਾਂ ਨਤੀਜੇ ਪੈਨਲ ਵਿੱਚ ਪ੍ਰਦਰਸ਼ਿਤ ਕੀਤੇ ਜਾਣਗੇ।',
+            'ਪ੍ਰਭਾਵਿਤ ਪੱਤੇ, ਤਣੇ ਜਾਂ ਬੱਲੀ ਦੀ ਸਾਫ਼ ਅਤੇ ਨੇੜਿਓਂ ਫ਼ੋਟੋ ਲਓ',
+            'ਹੇਠਾਂ ਫ਼ੋਟੋ ਅੱਪਲੋਡ ਕਰੋ',
+            'ਬਿਮਾਰੀ ਅਤੇ ਉਸਦਾ ਇਲਾਜ ਦੇਖਣ ਲਈ "ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ" ਦਬਾਓ',
         ],
         'upload_label': 'ਆਪਣੀ ਤਸਵੀਰ ਅੱਪਲੋਡ ਕਰੋ',
         'analyze_button': 'ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ',
@@ -584,6 +706,27 @@ TEXT = {
         'causes_label': 'ਕਾਰਨ',
         'preventions_label': 'ਰੋਕਥਾਮ',
         'remedies_label': 'ਉਪਾਅ',
+        'tagline': 'ਆਪਣੀ ਕਣਕ ਦੀ ਫ਼ੋਟੋ ਖਿੱਚੋ ਅਤੇ ਜਾਣੋ ਕਿ ਕੀ ਬਿਮਾਰੀ ਹੈ ਅਤੇ ਉਸਦਾ ਇਲਾਜ ਕੀ ਹੈ।',
+        'how_to_button': '▶️ ਵਰਤੋਂ ਕਿਵੇਂ ਕਰੀਏ',
+        'samples_button': '🖼️ ਨਮੂਨਾ ਤਸਵੀਰਾਂ',
+        'about_button': 'ℹ️ ਜਾਣਕਾਰੀ',
+        'samples_intro': 'ਇਹ ਉਹ ਬਿਮਾਰੀਆਂ ਅਤੇ ਕੀੜੇ ਹਨ ਜਿਨ੍ਹਾਂ ਨੂੰ ਵੀਟਚੈੱਕ ਪਛਾਣ ਸਕਦਾ ਹੈ।',
+        'animation_captions': [
+            'ਬਿਮਾਰ ਪੱਤੇ ਜਾਂ ਬੱਲੀ ਦੀ ਸਾਫ਼ ਫ਼ੋਟੋ ਲਓ',
+            'ਫ਼ੋਟੋ ਅੱਪਲੋਡ ਕਰੋ',
+            '"ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ" ਦਬਾਓ',
+            'ਬਿਮਾਰੀ ਦੇਖੋ ਅਤੇ ਦਵਾਈ ਖਰੀਦੋ',
+        ],
+        'buy_heading': '🛒 ਕਿੱਥੋਂ ਖਰੀਦੀਏ',
+        'buy_note': 'ਮਾਤਰਾ ਅਤੇ ਸੁਰੱਖਿਆ ਲਈ ਹਮੇਸ਼ਾ ਉਤਪਾਦ ਦਾ ਲੇਬਲ ਪੜ੍ਹੋ, ਅਤੇ ਛਿੜਕਾਅ ਤੋਂ ਪਹਿਲਾਂ ਆਪਣੇ ਸਥਾਨਕ ਖੇਤੀਬਾੜੀ ਅਫ਼ਸਰ ਜਾਂ ਕ੍ਰਿਸ਼ੀ ਵਿਗਿਆਨ ਕੇਂਦਰ ਤੋਂ ਸਲਾਹ ਲਓ।',
+        'healthy_tip': 'ਤੁਹਾਡੀ ਫ਼ਸਲ ਸਿਹਤਮੰਦ ਲੱਗਦੀ ਹੈ। ਸੰਤੁਲਿਤ ਖਾਦ ਨਾਲ ਇਸਨੂੰ ਮਜ਼ਬੂਤ ਰੱਖੋ:',
+        'product_types': {
+            'fungicide': 'ਉੱਲੀਨਾਸ਼ਕ',
+            'insecticide': 'ਕੀਟਨਾਸ਼ਕ',
+            'fertilizer': 'ਖਾਦ',
+            'bio': 'ਜੈਵਿਕ ਕੰਟਰੋਲ',
+            'seed': 'ਬੀਜ ਸੋਧ',
+        },
         'disease_names': {
             'Aphid': 'ਐਫੀਡ',
             'Brown Rust': 'ਭੂਰਾ ਜੰਗਾਲ',

@@ -12,7 +12,8 @@ from ultralytics import YOLO
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from content import GALLERY, LANGUAGES, TEXT  # noqa: E402
+from content import GALLERY, LANGUAGES, PRODUCTS, SHOPS, TEXT  # noqa: E402
+from howto import howto_html  # noqa: E402
 
 APP = ROOT / "streamlit_app.py"
 MODEL = ROOT / "best.pt"
@@ -66,6 +67,28 @@ def test_languages_have_the_same_keys():
         assert len(text["about"]) == len(TEXT["en"]["about"]), lang
 
 
+def test_every_class_has_products_to_buy(model):
+    for cls in model.names.values():
+        assert PRODUCTS[cls], cls
+        for name, kind in PRODUCTS[cls]:
+            for lang in TEXT:
+                assert TEXT[lang]["product_types"][kind], (lang, kind)
+
+
+def test_shop_urls_take_a_product_name():
+    for shop, url in SHOPS.items():
+        assert url.startswith("https://") and url.count("{}") == 1, shop
+
+
+def test_howto_animation_has_translated_text():
+    for text in TEXT.values():
+        html = howto_html(text["animation_captions"], text["analyze_button"],
+                          text["disease_names"]["Yellow Rust"], text["buy_heading"])
+        for caption in text["animation_captions"]:
+            assert caption.replace('"', "&quot;") in html
+        assert text["analyze_button"] in html
+
+
 def test_referenced_images_exist():
     paths = list(GALLERY.values()) + [
         s["image"] for t in TEXT.values() for s in t["intro"] + t["about"] if "image" in s
@@ -95,10 +118,11 @@ def _fake_yolo(cls, conf):
 
 
 def _run_app(screen=(1920, 1080), language=None, upload=None, click=False,
-             prediction=None, analytics=False):
+             prediction=None, analytics=False, press=None):
     """Run the app with the screen-size component faked.
 
     upload: sample image to feed the file uploader. click: press Analyze.
+    press: key of another button to press, such as "how_to".
     prediction: (class, confidence) to fake the model; real model otherwise.
     Analytics tracking is stubbed unless analytics=True: it records usage and
     wraps st.button with a copy saved on first use, which bypasses our mocks.
@@ -108,8 +132,11 @@ def _run_app(screen=(1920, 1080), language=None, upload=None, click=False,
         patches.append(mock.patch("streamlit_analytics2.track", lambda **kw: contextlib.nullcontext()))
     if upload is not None:
         patches.append(mock.patch("streamlit.file_uploader", return_value=open(ROOT / upload, "rb")))
-    if click:
-        patches.append(mock.patch("streamlit.button", return_value=True))
+    pressed = {"analyze"} if click else set()
+    if press:
+        pressed.add(press)
+    if pressed:
+        patches.append(mock.patch("streamlit.button", side_effect=lambda *a, **kw: kw.get("key") in pressed))
     if prediction is not None:
         patches.append(mock.patch("ultralytics.YOLO", _fake_yolo(*prediction)))
     st.cache_resource.clear()  # don't reuse a model loaded under a different patch
@@ -149,6 +176,34 @@ def test_app_runs_with_analytics_tracking():
     assert not at.exception, at.exception[0].message
 
 
+def _link_buttons(at):
+    return [e for e in at.get("link_button")]
+
+
+@pytest.mark.parametrize("press", ["how_to", "samples", "about"])
+@pytest.mark.parametrize("screen", [(1920, 1080), (390, 844)], ids=["landscape", "portrait"])
+def test_help_buttons_open_without_errors(press, screen):
+    at = _run_app(screen=screen, press=press)
+    assert not at.exception, at.exception[0].message
+
+
+def test_upload_page_hides_background_info_until_asked():
+    at = _run_app()
+    text = _text(at)
+    assert TEXT["en"]["intro"][0]["heading"] not in text
+    assert TEXT["en"]["samples_intro"] not in text
+    at = _run_app(press="about")
+    assert TEXT["en"]["intro"][0]["heading"] in _text(at)
+
+
+def test_remedies_link_to_shops():
+    at = _run_app(upload=GALLERY["Aphid"], click=True, prediction=("Aphid", 0.95))
+    assert not at.exception
+    urls = [b.proto.url for b in _link_buttons(at)]
+    assert len(urls) == len(PRODUCTS["Aphid"]) * len(SHOPS)
+    assert "https://www.amazon.in/s?k=Imidacloprid+17.8%25+SL" in urls
+
+
 def test_analyze_without_upload_asks_for_image():
     at = _run_app(click=True)
     assert not at.exception
@@ -160,7 +215,9 @@ def test_app_reports_disease_for_uploaded_image():
     assert not at.exception
     text = _text(at)
     assert "Disease: Aphid" in text
-    assert "Causes:" in text
+    for item in TEXT["en"]["diseases"]["Aphid"]["causes"] + TEXT["en"]["diseases"]["Aphid"]["remedies"]:
+        assert item in text
+    assert [t.label for t in at.tabs] == ["💊 Remedies", "🛡️ Preventions", "🔍 Causes"]
 
 
 def test_app_uses_translated_disease_name():
@@ -184,3 +241,4 @@ def test_healthy_prediction_shows_no_disease():
     text = _text(at)
     assert TEXT["en"]["no_disease"] in text
     assert "Disease:" not in text
+    assert len(_link_buttons(at)) == len(PRODUCTS["Healthy"]) * len(SHOPS)

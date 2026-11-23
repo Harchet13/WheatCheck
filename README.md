@@ -61,7 +61,8 @@ every training and test image.
 | Path | What it is |
 | --- | --- |
 | `streamlit_app.py` | The app: layout, image upload and prediction |
-| `content.py` | All user-facing text, per language |
+| `content.py` | All user-facing text, per language, and the products and shops behind the buy links |
+| `howto.py` | The animated "How to use" walkthrough |
 | `best.pt` | The trained YOLO classification model (stored in Git LFS) |
 | `assets/` | Logo, favicon and page images |
 | `assets/samples/` | One sample photo per disease, used in the gallery and tests |
@@ -75,6 +76,13 @@ every training and test image.
 All wording lives in `content.py`. To add a language, add its label to
 `LANGUAGES` and a matching entry to `TEXT` with the same keys as the existing
 ones; `pytest` will tell you if anything is missing.
+
+## Buy links
+
+Each result lists products a farmer can buy to act on the remedies, with links
+to online shops. The products per disease are in `PRODUCTS` in `content.py`
+and the shops in `SHOPS`; each shop URL is a search, filled in with the product
+name, so links keep working as listings change.
 
 ## Analytics
 
