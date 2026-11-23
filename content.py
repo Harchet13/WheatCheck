@@ -25,83 +25,86 @@ GALLERY = {
     'Yellow Rust': 'assets/samples/yellow_rust_test_3.png',
 }
 
-# Online agri-input shops. Each URL is a product search, filled in with the
-# product name, so links keep working when a shop's listings change.
+# Online agri-input shops: name -> URL. A URL with {} is a product search,
+# filled in with the product's search words. A URL without {} is the shop's home
+# page; the app tells farmers to type the product name into the shop's search bar.
+# (BigHaat's search pages can't be linked to directly.)
 SHOPS = {
-    'BigHaat': 'https://www.bighaat.com/search?q={}',
     'Amazon': 'https://www.amazon.in/s?k={}',
+    'BigHaat': 'https://www.bighaat.com/',
 }
 
 # Model class -> products a farmer can buy to act on the remedies, as
-# (product name, product type). Types are translated via TEXT[lang]['product_types'].
-# Names are active ingredients as printed on Indian product labels.
+# (name to search for, active ingredient or description, product type).
+# Names are common Indian brands where one is well known; generic products use
+# their plain name. Types are translated via TEXT[lang]['product_types'].
 PRODUCTS = {
     'Aphid': [
-        ('Imidacloprid 17.8% SL', 'insecticide'),
-        ('Thiamethoxam 25% WG', 'insecticide'),
-        ('Neem oil 1500 ppm', 'bio'),
+        ('Confidor', 'Imidacloprid 17.8% SL', 'insecticide'),
+        ('Actara', 'Thiamethoxam 25% WG', 'insecticide'),
+        ('Neem oil', 'Azadirachtin 1500 ppm', 'bio'),
     ],
     'Brown Rust': [
-        ('Propiconazole 25% EC', 'fungicide'),
-        ('Tebuconazole 25.9% EC', 'fungicide'),
-        ('Muriate of Potash', 'fertilizer'),
+        ('Tilt', 'Propiconazole 25% EC', 'fungicide'),
+        ('Folicur', 'Tebuconazole 25.9% EC', 'fungicide'),
+        ('Muriate of Potash', 'Potassium chloride (MOP)', 'fertilizer'),
     ],
     'Mite': [
-        ('Sulphur 80% WDG', 'fungicide'),
-        ('Propargite 57% EC', 'insecticide'),
-        ('Neem oil 1500 ppm', 'bio'),
+        ('Thiovit Jet', 'Sulphur 80% WDG', 'fungicide'),
+        ('Omite', 'Propargite 57% EC', 'insecticide'),
+        ('Neem oil', 'Azadirachtin 1500 ppm', 'bio'),
     ],
     'Stem fly': [
-        ('Thiamethoxam 30% FS', 'seed'),
-        ('Imidacloprid 48% FS', 'seed'),
-        ('Fipronil 0.3% GR', 'insecticide'),
+        ('Cruiser', 'Thiamethoxam 30% FS', 'seed'),
+        ('Gaucho', 'Imidacloprid 48% FS', 'seed'),
+        ('Regent', 'Fipronil 0.3% GR', 'insecticide'),
     ],
     'Black Rust': [
-        ('Propiconazole 25% EC', 'fungicide'),
-        ('Tebuconazole 25.9% EC', 'fungicide'),
-        ('Muriate of Potash', 'fertilizer'),
+        ('Tilt', 'Propiconazole 25% EC', 'fungicide'),
+        ('Folicur', 'Tebuconazole 25.9% EC', 'fungicide'),
+        ('Muriate of Potash', 'Potassium chloride (MOP)', 'fertilizer'),
     ],
     'Common Root Rot': [
-        ('Carbendazim 50% WP', 'seed'),
-        ('Trichoderma viride', 'bio'),
-        ('NPK 12-32-16 fertilizer', 'fertilizer'),
+        ('Bavistin', 'Carbendazim 50% WP', 'seed'),
+        ('Trichoderma viride', 'Bio-fungicide', 'bio'),
+        ('NPK 12-32-16', 'Nitrogen-phosphorus-potash', 'fertilizer'),
     ],
     'Leaf Blight': [
-        ('Mancozeb 75% WP', 'fungicide'),
-        ('Propiconazole 25% EC', 'fungicide'),
+        ('Dithane M-45', 'Mancozeb 75% WP', 'fungicide'),
+        ('Tilt', 'Propiconazole 25% EC', 'fungicide'),
     ],
     'Septoria': [
-        ('Azoxystrobin 23% SC', 'fungicide'),
-        ('Mancozeb 75% WP', 'fungicide'),
+        ('Amistar', 'Azoxystrobin 23% SC', 'fungicide'),
+        ('Dithane M-45', 'Mancozeb 75% WP', 'fungicide'),
     ],
     'Tan spot': [
-        ('Mancozeb 75% WP', 'fungicide'),
-        ('Azoxystrobin 11% + Tebuconazole 18.3% SC', 'fungicide'),
+        ('Dithane M-45', 'Mancozeb 75% WP', 'fungicide'),
+        ('Custodia', 'Azoxystrobin 11% + Tebuconazole 18.3% SC', 'fungicide'),
     ],
     'Blast': [
-        ('Tricyclazole 75% WP', 'fungicide'),
-        ('Azoxystrobin 23% SC', 'fungicide'),
+        ('Beam', 'Tricyclazole 75% WP', 'fungicide'),
+        ('Amistar', 'Azoxystrobin 23% SC', 'fungicide'),
     ],
     'Fusarium Head Blight': [
-        ('Tebuconazole 25.9% EC', 'fungicide'),
-        ('Carbendazim 50% WP', 'fungicide'),
+        ('Folicur', 'Tebuconazole 25.9% EC', 'fungicide'),
+        ('Bavistin', 'Carbendazim 50% WP', 'fungicide'),
     ],
     'Mildew': [
-        ('Sulphur 80% WP', 'fungicide'),
-        ('Propiconazole 25% EC', 'fungicide'),
+        ('Sulfex', 'Sulphur 80% WP', 'fungicide'),
+        ('Tilt', 'Propiconazole 25% EC', 'fungicide'),
     ],
     'Smut': [
-        ('Carboxin 37.5% + Thiram 37.5% WS', 'seed'),
-        ('Tebuconazole 2% DS', 'seed'),
+        ('Vitavax Power', 'Carboxin 37.5% + Thiram 37.5% WS', 'seed'),
+        ('Raxil', 'Tebuconazole 2% DS', 'seed'),
     ],
     'Yellow Rust': [
-        ('Propiconazole 25% EC', 'fungicide'),
-        ('Tebuconazole 50% + Trifloxystrobin 25% WG', 'fungicide'),
-        ('Muriate of Potash', 'fertilizer'),
+        ('Tilt', 'Propiconazole 25% EC', 'fungicide'),
+        ('Nativo', 'Tebuconazole 50% + Trifloxystrobin 25% WG', 'fungicide'),
+        ('Muriate of Potash', 'Potassium chloride (MOP)', 'fertilizer'),
     ],
     'Healthy': [
-        ('NPK 19-19-19 fertilizer', 'fertilizer'),
-        ('Zinc sulphate fertilizer', 'fertilizer'),
+        ('NPK 19-19-19', 'Water-soluble NPK', 'fertilizer'),
+        ('Zinc sulphate', 'Zinc sulphate 33%', 'fertilizer'),
     ],
 }
 
@@ -183,6 +186,7 @@ TEXT = {
             'See the disease and buy the remedy',
         ],
         'buy_heading': '🛒 Where to buy',
+        'shop_search_hint': 'BigHaat opens on its home page: type the name in bold into its search bar.',
         'buy_note': 'Always read the product label for dose and safety, and check with your local agriculture officer or Krishi Vigyan Kendra before spraying.',
         'healthy_tip': 'Your crop looks healthy. Keep it strong with balanced fertilizer:',
         'product_types': {
@@ -437,6 +441,7 @@ TEXT = {
             'बीमारी देखें और दवा खरीदें',
         ],
         'buy_heading': '🛒 कहाँ से खरीदें',
+        'shop_search_hint': 'BigHaat अपने होम पेज पर खुलता है: मोटे अक्षरों में लिखा नाम उसके सर्च बार में लिखें।',
         'buy_note': 'मात्रा और सुरक्षा के लिए हमेशा उत्पाद का लेबल पढ़ें, और छिड़काव से पहले अपने स्थानीय कृषि अधिकारी या कृषि विज्ञान केंद्र से सलाह लें।',
         'healthy_tip': 'आपकी फसल स्वस्थ दिखती है। संतुलित उर्वरक से इसे मज़बूत रखें:',
         'product_types': {
@@ -718,6 +723,7 @@ TEXT = {
             'ਬਿਮਾਰੀ ਦੇਖੋ ਅਤੇ ਦਵਾਈ ਖਰੀਦੋ',
         ],
         'buy_heading': '🛒 ਕਿੱਥੋਂ ਖਰੀਦੀਏ',
+        'shop_search_hint': "BigHaat ਆਪਣੇ ਹੋਮ ਪੇਜ 'ਤੇ ਖੁੱਲ੍ਹਦਾ ਹੈ: ਮੋਟੇ ਅੱਖਰਾਂ ਵਿੱਚ ਲਿਖਿਆ ਨਾਮ ਉਸਦੇ ਸਰਚ ਬਾਰ ਵਿੱਚ ਲਿਖੋ।",
         'buy_note': 'ਮਾਤਰਾ ਅਤੇ ਸੁਰੱਖਿਆ ਲਈ ਹਮੇਸ਼ਾ ਉਤਪਾਦ ਦਾ ਲੇਬਲ ਪੜ੍ਹੋ, ਅਤੇ ਛਿੜਕਾਅ ਤੋਂ ਪਹਿਲਾਂ ਆਪਣੇ ਸਥਾਨਕ ਖੇਤੀਬਾੜੀ ਅਫ਼ਸਰ ਜਾਂ ਕ੍ਰਿਸ਼ੀ ਵਿਗਿਆਨ ਕੇਂਦਰ ਤੋਂ ਸਲਾਹ ਲਓ।',
         'healthy_tip': 'ਤੁਹਾਡੀ ਫ਼ਸਲ ਸਿਹਤਮੰਦ ਲੱਗਦੀ ਹੈ। ਸੰਤੁਲਿਤ ਖਾਦ ਨਾਲ ਇਸਨੂੰ ਮਜ਼ਬੂਤ ਰੱਖੋ:',
         'product_types': {

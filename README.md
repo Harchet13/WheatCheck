@@ -81,8 +81,10 @@ ones; `pytest` will tell you if anything is missing.
 
 Each result lists products a farmer can buy to act on the remedies, with links
 to online shops. The products per disease are in `PRODUCTS` in `content.py`
-and the shops in `SHOPS`; each shop URL is a search, filled in with the product
-name, so links keep working as listings change.
+and the shops in `SHOPS`. A shop URL containing `{}` is a search, filled in
+with the product name, so links keep working as listings change. A URL without
+`{}` (BigHaat, whose search pages can't be linked to) opens the shop's home
+page, and the app tells farmers to type the product name into its search bar.
 
 ## Analytics
 

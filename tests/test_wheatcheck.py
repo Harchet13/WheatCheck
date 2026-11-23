@@ -70,14 +70,15 @@ def test_languages_have_the_same_keys():
 def test_every_class_has_products_to_buy(model):
     for cls in model.names.values():
         assert PRODUCTS[cls], cls
-        for name, kind in PRODUCTS[cls]:
+        for name, ingredient, kind in PRODUCTS[cls]:
+            assert name and ingredient, cls
             for lang in TEXT:
                 assert TEXT[lang]["product_types"][kind], (lang, kind)
 
 
-def test_shop_urls_take_a_product_name():
+def test_shop_urls_are_searches_or_home_pages():
     for shop, url in SHOPS.items():
-        assert url.startswith("https://") and url.count("{}") == 1, shop
+        assert url.startswith("https://") and url.count("{}") <= 1, shop
 
 
 def test_howto_animation_has_translated_text():
@@ -201,7 +202,9 @@ def test_remedies_link_to_shops():
     assert not at.exception
     urls = [b.proto.url for b in _link_buttons(at)]
     assert len(urls) == len(PRODUCTS["Aphid"]) * len(SHOPS)
-    assert "https://www.amazon.in/s?k=Imidacloprid+17.8%25+SL" in urls
+    assert "https://www.amazon.in/s?k=Confidor+Imidacloprid" in urls
+    assert "https://www.bighaat.com/" in urls
+    assert TEXT["en"]["shop_search_hint"] in "\n".join(c.value for c in at.caption)
 
 
 def test_analyze_without_upload_asks_for_image():

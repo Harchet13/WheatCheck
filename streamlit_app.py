@@ -127,14 +127,31 @@ def about_dialog(text):
         render_section(section)
 
 
+def search_words(name, ingredient):
+    """What to type into a shop's search for a product.
+
+    Brand names are paired with their active ingredient's first word (e.g.
+    "Tilt Propiconazole") so the search finds the right product; generic
+    products are searched by name alone.
+    """
+    return f"{name} {ingredient.split()[0]}" if "%" in ingredient else name
+
+
+def shop_url(url, name, ingredient):
+    """A shop link: a product search where the shop supports it, else its home page."""
+    return url.format(quote_plus(search_words(name, ingredient))) if "{}" in url else url
+
+
 def render_products(text, cls):
     """Buy links for the products that act on the remedies for `cls`."""
     st.markdown(f"**{text['buy_heading']}**")
-    for name, kind in PRODUCTS[cls]:
+    if any("{}" not in url for url in SHOPS.values()):
+        st.caption(text["shop_search_hint"])
+    for name, ingredient, kind in PRODUCTS[cls]:
         with st.container(border=True):
-            st.markdown(f"**{name}**  \n:gray[{text['product_types'][kind]}]")
+            st.markdown(f"**{name}** · {ingredient}  \n:gray[{text['product_types'][kind]}]")
             for col, (shop, url) in zip(st.columns(len(SHOPS)), SHOPS.items()):
-                col.link_button(f"{shop} ↗", url.format(quote_plus(name)), use_container_width=True)
+                col.link_button(f"{shop} ↗", shop_url(url, name, ingredient), use_container_width=True)
     st.caption(text["buy_note"])
 
 
