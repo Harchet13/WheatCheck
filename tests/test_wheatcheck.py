@@ -204,6 +204,9 @@ def test_remedies_link_to_shops():
     assert len(urls) == len(PRODUCTS["Aphid"]) * len(SHOPS)
     assert "https://www.amazon.in/s?k=Confidor+Imidacloprid" in urls
     assert "https://www.bighaat.com/" in urls
+    urls = [b.proto.url for b in _link_buttons(
+        _run_app(upload=GALLERY["Aphid"], click=True, prediction=("Healthy", 0.99)))]
+    assert "https://www.amazon.in/s?k=Zinc+sulphate" in urls
     assert TEXT["en"]["shop_search_hint"] in "\n".join(c.value for c in at.caption)
 
 

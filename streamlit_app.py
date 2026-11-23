@@ -134,7 +134,8 @@ def search_words(name, ingredient):
     "Tilt Propiconazole") so the search finds the right product; generic
     products are searched by name alone.
     """
-    return f"{name} {ingredient.split()[0]}" if "%" in ingredient else name
+    word = ingredient.split()[0]
+    return f"{name} {word}" if "%" in ingredient and word.lower() not in name.lower() else name
 
 
 def shop_url(url, name, ingredient):
