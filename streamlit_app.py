@@ -34,7 +34,21 @@ st.html("""<style>
 .st-key-lang_bar button * { color: #1b1b1b !important; font-size: 1.1rem; font-weight: 600; }
 .st-key-lang_bar button[aria-checked="true"] { background: #1b1b1b !important; border-color: #1b1b1b !important; }
 .st-key-lang_bar button[aria-checked="true"] * { color: #F5C518 !important; }
+[data-testid="stMainBlockContainer"] { padding-top: 2.5rem; }
 .st-key-upload_card { background: rgba(0,0,0,.18); }
+.st-key-upload_card h3 { font-size: 1.3rem; }
+/* The main action: gold like the language bar, with dark text for contrast. */
+.st-key-analyze button { background: #F5C518; border-color: #F5C518; min-height: 3rem; }
+.st-key-analyze button:hover { background: #ffd84d; border-color: #ffd84d; }
+.st-key-analyze button p { color: #1b1b1b; font-weight: 700; font-size: 1.15rem; }
+/* Keep the help buttons and each product's shop buttons side by side on phones,
+   instead of Streamlit stacking every column. */
+.st-key-help_row [data-testid="stHorizontalBlock"],
+[class*="st-key-product_"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: .5rem; }
+.st-key-help_row [data-testid="stColumn"],
+[class*="st-key-product_"] [data-testid="stColumn"] { min-width: 0 !important; width: auto !important; flex: 1 1 0 !important; }
+.st-key-help_row button { min-height: 3.2rem; padding: .25rem .4rem; }
+.st-key-help_row button p { font-size: .9rem; line-height: 1.25; white-space: normal; }
 .wc-header { display: flex; align-items: center; gap: 14px; margin: .5rem 0 .25rem; }
 .wc-header img { width: 72px; height: 72px; flex: none; border-radius: 50%; }
 .wc-title { margin: 0; padding: 0 !important; font-size: clamp(1.3rem, 5.5vw, 2rem) !important; line-height: 1.25 !important; }
@@ -103,6 +117,10 @@ def render_gallery(text, portrait):
                 col.image(thumbnail(path), caption=names[cls])
 
 
+def render_photo_tips(text):
+    st.markdown(f"**📷 {text['photo_tips_heading']}**\n\n" + "\n".join(f"- {tip}" for tip in text["photo_tips"]))
+
+
 # Pop-up windows opened by the help buttons; only one is open at a time.
 @st.dialog("WheatCheck", width="large")
 def howto_dialog(text):
@@ -112,6 +130,7 @@ def howto_dialog(text):
                    text["disease_names"]["Yellow Rust"], text["buy_heading"]),
         height=500,
     )
+    render_photo_tips(text)
 
 
 @st.dialog("WheatCheck", width="large")
@@ -148,8 +167,8 @@ def render_products(text, cls):
     st.markdown(f"**{text['buy_heading']}**")
     if any("{}" not in url for url in SHOPS.values()):
         st.caption(text["shop_search_hint"])
-    for name, ingredient, kind in PRODUCTS[cls]:
-        with st.container(border=True):
+    for i, (name, ingredient, kind) in enumerate(PRODUCTS[cls]):
+        with st.container(border=True, key=f"product_{i}"):
             st.markdown(f"**{name}** · {ingredient}  \n:gray[{text['product_types'][kind]}]")
             for col, (shop, url) in zip(st.columns(len(SHOPS)), SHOPS.items()):
                 col.link_button(f"{shop} ↗", shop_url(url, name, ingredient), use_container_width=True)
@@ -169,6 +188,7 @@ def render_result(text, upload):
     with details:
         if conf < CONFIDENCE_THRESHOLD:
             st.warning(text["low_confidence"])
+            render_photo_tips(text)
             return
         if cls == "Healthy":
             st.success(text["no_disease"])
@@ -176,7 +196,6 @@ def render_result(text, upload):
             render_products(text, cls)
             return
         info = text["diseases"][cls]
-        st.markdown(text["result_heading"])
         st.subheader(f"{text['disease_label']}: {text['disease_names'][cls]}")
         st.progress(conf, text=f"{text['confidence_label']}: {conf:.0%}")
         st.write(info["description"])
@@ -192,16 +211,29 @@ def render_result(text, upload):
     causes.markdown("\n".join(f"- {item}" for item in info["causes"]))
 
 
+def keep_a_language():
+    """Clicking the selected language again would clear it; restore the last one instead."""
+    if st.session_state["selected_language"] is None:
+        st.session_state["selected_language"] = st.session_state.get("last_language", "English")
+
+
 portrait = is_portrait()
+
+# The language can be preset with ?lang=pa (or hi, en), so links can be shared in any language.
+if "selected_language" not in st.session_state:
+    by_code = {code: label for label, code in LANGUAGES.items()}
+    st.session_state["selected_language"] = by_code.get(st.query_params.get("lang"), "English")
 
 # The analytics dashboard is at ?analytics=on; set ANALYTICS_PASSWORD to protect it.
 with streamlit_analytics.track(unsafe_password=os.environ.get("ANALYTICS_PASSWORD")):
     with st.container(key="lang_bar"):
         language = st.segmented_control(
-            LANGUAGE_LABEL, options=list(LANGUAGES), default="English", key="selected_language",
+            LANGUAGE_LABEL, options=list(LANGUAGES), key="selected_language", on_change=keep_a_language,
         )
-    # Clicking the selected language again clears it; fall back to English.
-    text = TEXT[LANGUAGES[language or "English"]]
+    st.session_state["last_language"] = language
+    lang = LANGUAGES[language or "English"]
+    st.query_params["lang"] = lang
+    text = TEXT[lang]
 
     # Logo and title stay side by side, even on phones.
     st.markdown(
@@ -211,7 +243,7 @@ with streamlit_analytics.track(unsafe_password=os.environ.get("ANALYTICS_PASSWOR
     )
 
     # Everything except the upload steps lives behind these buttons.
-    how_col, samples_col, about_col = st.columns(3)
+    how_col, samples_col, about_col = st.container(key="help_row").columns(3)
     with how_col:
         if st.button(text["how_to_button"], key="how_to", use_container_width=True):
             howto_dialog(text)

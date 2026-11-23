@@ -119,11 +119,12 @@ def _fake_yolo(cls, conf):
 
 
 def _run_app(screen=(1920, 1080), language=None, upload=None, click=False,
-             prediction=None, analytics=False, press=None):
+             prediction=None, analytics=False, press=None, query=None):
     """Run the app with the screen-size component faked.
 
     upload: sample image to feed the file uploader. click: press Analyze.
     press: key of another button to press, such as "how_to".
+    query: URL query parameters, such as {"lang": "pa"}.
     prediction: (class, confidence) to fake the model; real model otherwise.
     Analytics tracking is stubbed unless analytics=True: it records usage and
     wraps st.button with a copy saved on first use, which bypasses our mocks.
@@ -147,6 +148,8 @@ def _run_app(screen=(1920, 1080), language=None, upload=None, click=False,
         at = AppTest.from_file(str(APP), default_timeout=120)
         if language is not None:
             at.session_state["selected_language"] = language
+        for key, value in (query or {}).items():
+            at.query_params[key] = value
         at.run()
         return at
     finally:
@@ -220,16 +223,16 @@ def test_app_reports_disease_for_uploaded_image():
     at = _run_app(upload=GALLERY["Aphid"], click=True)
     assert not at.exception
     text = _text(at)
-    assert "Disease: Aphid" in text
+    assert "Detected: Aphid" in text
     for item in TEXT["en"]["diseases"]["Aphid"]["causes"] + TEXT["en"]["diseases"]["Aphid"]["remedies"]:
         assert item in text
-    assert [t.label for t in at.tabs] == ["💊 Remedies", "🛡️ Preventions", "🔍 Causes"]
+    assert [t.label for t in at.tabs] == ["💊 Remedies", "🛡️ Prevention", "🔍 Causes"]
 
 
 def test_app_uses_translated_disease_name():
     at = _run_app(language="हिंदी", upload=GALLERY["Mite"], click=True, prediction=("Mite", 0.95))
     assert not at.exception
-    assert "बीमारी: घुन" in _text(at)
+    assert "पहचान: माइट (बरुथी)" in _text(at)
 
 
 def test_low_confidence_is_not_reported_as_healthy():
@@ -237,8 +240,10 @@ def test_low_confidence_is_not_reported_as_healthy():
     assert not at.exception
     text = _text(at)
     assert TEXT["en"]["low_confidence"] in text
+    for tip in TEXT["en"]["photo_tips"]:
+        assert tip in text
     assert TEXT["en"]["no_disease"] not in text
-    assert "Disease:" not in text
+    assert "Detected:" not in text
 
 
 def test_healthy_prediction_shows_no_disease():
@@ -246,5 +251,25 @@ def test_healthy_prediction_shows_no_disease():
     assert not at.exception
     text = _text(at)
     assert TEXT["en"]["no_disease"] in text
-    assert "Disease:" not in text
+    assert "Detected:" not in text
     assert len(_link_buttons(at)) == len(PRODUCTS["Healthy"]) * len(SHOPS)
+
+
+@pytest.mark.parametrize("code", ["pa", "hi"])
+def test_language_can_be_set_from_the_link(code):
+    at = _run_app(query={"lang": code})
+    assert not at.exception
+    assert TEXT[code]["title"] in _text(at)
+    assert at.query_params["lang"] == code
+
+
+def test_unknown_language_in_link_falls_back_to_english():
+    at = _run_app(query={"lang": "xx"})
+    assert not at.exception
+    assert TEXT["en"]["title"] in _text(at)
+
+
+def test_choosing_a_language_updates_the_link():
+    at = _run_app(language="ਪੰਜਾਬੀ")
+    assert not at.exception
+    assert at.query_params["lang"] == "pa"

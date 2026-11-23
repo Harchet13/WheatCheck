@@ -4,3 +4,11 @@ backgroundColor="#436773"
 secondaryBackgroundColor="#262730"
 textColor="#FFFFFF"
 font="monospace"
+
+[client]
+# Hide the developer menu and Deploy button from visitors.
+toolbarMode = "minimal"
+
+[server]
+# Phone photos are a few MB; a lower limit makes the uploader's "per file" note less daunting.
+maxUploadSize = 20

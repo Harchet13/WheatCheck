@@ -55,7 +55,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #ff
         animation: scan var(--loop) infinite; animation-delay: var(--at); }
 @keyframes scan { 0%, 10% { top: -4px; opacity: 0; } 11% { opacity: 1; } 22% { top: 176px; opacity: 1; } 23%, 100% { opacity: 0; } }
 .go { position: absolute; left: 30px; right: 30px; top: 250px; height: 50px; border-radius: 12px;
-      background: #BF9A1E; color: #fff; font-weight: 700; font-size: 17px;
+      background: #F5C518; color: #1b1b1b; font-weight: 700; font-size: 17px;
       display: flex; align-items: center; justify-content: center;
       animation: tap var(--loop) infinite; animation-delay: var(--at); }
 @keyframes tap { 0%, 8% { transform: scale(1); } 9% { transform: scale(.92); filter: brightness(.85); } 11%, 100% { transform: scale(1); } }

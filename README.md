@@ -77,6 +77,14 @@ All wording lives in `content.py`. To add a language, add its label to
 `LANGUAGES` and a matching entry to `TEXT` with the same keys as the existing
 ones; `pytest` will tell you if anything is missing.
 
+The disease advice is written for north Indian wheat growers, and the Hindi and
+Punjabi use the terms farmers there know (for example पीला रतुआ / ਪੀਲੀ ਕੁੰਗੀ
+for yellow rust).
+
+A link can open the app in a chosen language: add `?lang=pa` (Punjabi),
+`?lang=hi` (Hindi) or `?lang=en` to the app's URL. The URL updates as users
+switch languages, so a shared link keeps the language.
+
 ## Buy links
 
 Each result lists products a farmer can buy to act on the remedies, with links
