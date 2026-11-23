@@ -61,7 +61,8 @@ every training and test image.
 | Path | What it is |
 | --- | --- |
 | `streamlit_app.py` | The app: layout, image upload and prediction |
-| `content.py` | All user-facing text, per language |
+| `content.py` | All user-facing text, per language, and the products and shops behind the buy links |
+| `howto.py` | The animated "How to use" walkthrough |
 | `best.pt` | The trained YOLO classification model (stored in Git LFS) |
 | `assets/` | Logo, favicon and page images |
 | `assets/samples/` | One sample photo per disease, used in the gallery and tests |
@@ -75,6 +76,23 @@ every training and test image.
 All wording lives in `content.py`. To add a language, add its label to
 `LANGUAGES` and a matching entry to `TEXT` with the same keys as the existing
 ones; `pytest` will tell you if anything is missing.
+
+The disease advice is written for north Indian wheat growers, and the Hindi and
+Punjabi use the terms farmers there know (for example पीला रतुआ / ਪੀਲੀ ਕੁੰਗੀ
+for yellow rust).
+
+A link can open the app in a chosen language: add `?lang=pa` (Punjabi),
+`?lang=hi` (Hindi) or `?lang=en` to the app's URL. The URL updates as users
+switch languages, so a shared link keeps the language.
+
+## Buy links
+
+Each result lists products a farmer can buy to act on the remedies, with links
+to online shops. The products per disease are in `PRODUCTS` in `content.py`
+and the shops in `SHOPS`. A shop URL containing `{}` is a search, filled in
+with the product name, so links keep working as listings change. A URL without
+`{}` (BigHaat, whose search pages can't be linked to) opens the shop's home
+page, and the app tells farmers to type the product name into its search bar.
 
 ## Analytics
 
